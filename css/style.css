@@ -128,8 +128,7 @@ body {
 #results-list {
   padding: 0;
   list-style-type: none;
-  overflow: auto;
-  height: 60%;
+  overflow: none;
   max-height: 600px;
 }
 
