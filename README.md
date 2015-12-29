@@ -30,7 +30,7 @@ you can go to this link to find more cities if you are interested: https://en.wi
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+I deploy this app to github platform. you can access web app through this link: http://vncling.github.io/Udacity-Map-Project/index.html
 
 ## Built With
 
