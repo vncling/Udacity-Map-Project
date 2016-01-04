@@ -92,12 +92,13 @@ body {
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
   position: absolute;
+  overflow: scroll;
   top: 25px;
   right: 10px;
   background: rgba(0, 0, 0, 0.7);
   width: 25%;
-  height: 75%;
-  max-height: 90%;
+  height: 60%;
+  max-height: 80%;
   border: 1px solid gray;
 }
 
@@ -128,9 +129,8 @@ body {
 #results-list {
   padding: 0;
   list-style-type: none;
-  overflow: auto;
-  height: 75%;
-   max-height: 600px;
+  overflow: scroll;
+  max-height: 650px;
 }
 
 #results-list li {
