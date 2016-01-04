@@ -1,6 +1,7 @@
+'use strict';
 function appViewModel() {
   var self = this;
-  var map, city, infowindow;
+  var map, infowindow;
   var yelpLocations = [];
   var yelpReadableNames = [];
 
@@ -9,6 +10,7 @@ function appViewModel() {
   this.mapMarkers = ko.observableArray([]);  //holds all map markers
   this.dealStatus = ko.observable('Searching for deals nearby...');
   this.searchStatus = ko.observable();
+  this.errormessage = ko.observable();
   this.searchLocation = ko.observable('Orlando FL');
   this.loadImg = ko.observable();
   this.numDeals = ko.computed(function() {
@@ -128,14 +130,15 @@ function appViewModel() {
       self.toggleSymbol('hide');
     }
   };
-
-
+//Error handling if Google Maps fails to load
+ var mapRequestTimeout = setTimeout(function() {
+    self.errormessage('We had trouble loading Google Maps. Please refresh your browser and try again.');
+  }, 3000);
 
 // Initialize Google map, perform initial deal search on a city.
-  function mapInitialize() {
-    city = new google.maps.LatLng(28.52169775, -81.36873845);
+  function initMap() {
     map = new google.maps.Map(document.getElementById('map-canvas'), {
-          center: city,
+          center: {lat: 28.52169775, lng: -81.36873845},
           zoom: 12,
           zoomControlOptions: {
             position: google.maps.ControlPosition.LEFT_CENTER,
@@ -148,7 +151,7 @@ function appViewModel() {
           panControl: false
         });
    
-    clearTimeout(self.mapRequestTimeout);
+    clearTimeout(mapRequestTimeout);
 
     google.maps.event.addDomListener(window, "resize", function() {
        var center = map.getCenter();
@@ -161,10 +164,6 @@ function appViewModel() {
     getYelpLocations();
   }
 
- //Error handling if Google Maps fails to load
-  this.mapRequestTimeout = setTimeout(function() {
-    $('#map-canvas').html('We had trouble loading Google Maps. Please refresh your browser and try again.');
-  }, 8000);
 
 // Use API to get deal data and store the info as objects in an array
   function getYelps(location) {
@@ -185,7 +184,7 @@ function appViewModel() {
 
             var filters = 'food';
             var near = location;
-
+            var parameters;
             var accessor = {
                 consumerSecret : auth.consumerSecret,
                 tokenSecret : auth.accessTokenSecret
@@ -210,9 +209,9 @@ function appViewModel() {
             OAuth.SignatureMethod.sign(message, accessor);
 
             var parameterMap = OAuth.getParameterMap(message.parameters);
-    //var yelpUrl = "https://partner-api.yelp.com/deals.json?tsToken=US_AFF_0_203644_212556_0&limit=50&offset=0&division_id=";
-    //var divId = location;
-
+            var yelpRequestTimeout = setTimeout(function() {
+               self.dealStatus('Oops, something went wrong, please refresh and try again later.');
+             }, 8000);
     $.ajax({
       'url' : message.action,
       'data' : parameterMap,
@@ -237,6 +236,7 @@ function appViewModel() {
 			  rating = data.businesses[i].rating_img_url_small,
               tags = data.businesses[i].name;
 		
+		 clearTimeout(yelpRequestTimeout);
           // Some venues have a Yelp rating included. If there is no rating, 
           //function will stop running because the variable is undefined. 
           //This if statement handles that scenario by setting rating to an empty string.
@@ -383,7 +383,7 @@ function appViewModel() {
     }
   };
 
-  mapInitialize();
+  initMap();
 }
 
 //custom binding highlights the search text on focus
