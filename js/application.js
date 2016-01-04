@@ -130,13 +130,15 @@ function appViewModel() {
       self.toggleSymbol('hide');
     }
   };
+  
+			  
 //Error handling if Google Maps fails to load
  var mapRequestTimeout = setTimeout(function() {
     self.errormessage('We had trouble loading Google Maps. Please refresh your browser and try again.');
-  }, 3000);
+  }, 8000);
 
 // Initialize Google map, perform initial deal search on a city.
-  function initMap() {
+function initMap() {
     map = new google.maps.Map(document.getElementById('map-canvas'), {
           center: {lat: 28.52169775, lng: -81.36873845},
           zoom: 12,
@@ -181,8 +183,8 @@ function appViewModel() {
                     signatureMethod : "HMAC-SHA1"
                 }
             };
-
-            var filters = 'food';
+            // change category from Food to Restaurants to avoid food cart issue with no latitude and longitude.
+            var filters = 'restaurants';
             var near = location;
             var parameters;
             var accessor = {
@@ -221,7 +223,7 @@ function appViewModel() {
         console.log(data);
         var len = data.businesses.length;
         for(var i = 0; i < len; i++) {
-			
+
           var venueName = data.businesses[i].name,
               venueLat = data.businesses[i].location.coordinate.latitude,
               venueLon = data.businesses[i].location.coordinate.longitude,
@@ -386,6 +388,7 @@ function appViewModel() {
   initMap();
 }
 
+
 //custom binding highlights the search text on focus
 
 ko.bindingHandlers.selectOnFocus = {
@@ -397,3 +400,5 @@ ko.bindingHandlers.selectOnFocus = {
       };
 
 ko.applyBindings(new appViewModel());
+
+
