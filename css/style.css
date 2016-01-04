@@ -130,7 +130,7 @@ body {
   list-style-type: none;
   overflow: auto;
   height: 75%;
-  max-height: 90%;
+   max-height: 600px;
 }
 
 #results-list li {
