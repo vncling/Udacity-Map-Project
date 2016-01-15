@@ -18,10 +18,8 @@
       <input type="submit" value="Go!" id="submit">
       <p data-bind="text: searchStatus"></p>
     </form>
-    <form data-bind="submit: filterResults" class="resultsform">
-      <input type="text" placeholder="Filter by name/type" data-bind="value:filterKeyword, selectOnFocus: true">
-      <input type="submit" value="Find!" id="submit">
-      <p data-bind="visible: filterKeyword().length > 0, click: clearFilter" class="clearbutton">Clear filter</p>
+    <form class="resultsform">
+    <input type="text" placeholder="Filter by name/type" data-bind="textInput:filterKeyword, selectOnFocus: true">
     </form>
   </div>
 
@@ -46,7 +44,6 @@
       </ul>
     </div>
   </div>
-  <div>
 
 <!-- Mobile list of results, mobile navigation buttons, hidden until media query is activated -->
   <div title="toggle search bar" class="searchbtn" data-bind="click: searchToggle">
@@ -77,23 +74,12 @@
       </ul>
     </div>
   </div>
-   <script>
-
-var map;
-function initMap() {
-  map = new google.maps.Map(document.getElementById('map-canvas'), {
-    center: {lat: -34.397, lng: 150.644},
-    zoom: 8
-  });
-}
-</script>
 <script src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>
 <script src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
-<!-- This is a map app so that we need to load the map first to be able to pin all the places, thus async is not possible for this app due to no other functions is possible without a map logically in place. -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZR_3Vt-nU5LT3W60kuvZmevjQv27uS4&libraries=geometry,places"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 <script src="js/knockout-3.4.0.js"></script>
 <script src="js/jquery.autocomplete.js"></script>
 <script src="js/application.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8ZR_3Vt-nU5LT3W60kuvZmevjQv27uS4&libraries=geometry,places&callback=googleCallback"></script>
 </body>
 </html>

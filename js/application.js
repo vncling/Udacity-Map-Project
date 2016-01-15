@@ -1,5 +1,6 @@
-'use strict';
+
 function appViewModel() {
+  'use strict';
   var self = this;
   var map, infowindow;
   var yelpLocations = [];
@@ -45,7 +46,7 @@ function appViewModel() {
     //Need to use a jQuery selector instead of KO binding because this field is affected by the autocomplete plugin.  The value inputted does not seem to register via KO.
     self.searchStatus('');
     self.searchStatus('Searching...');
-    var newAddress = $('#autocomplete').val();
+    var newAddress = self.searchLocation();
 
     //newYelpId will hold the Yelp-formatted ID of the inputted city.
     var newYelpId, newLat, newLng;
@@ -81,36 +82,40 @@ function appViewModel() {
 
   //Compare search keyword against names and dealTags of existing deals.  Return a filtered list and map markers of request.
 
-  this.filterResults = function() {
-    var searchWord = self.filterKeyword().toLowerCase();
-    var array = self.yelpDeals();
-    if(!searchWord) {
-      return;
+  this.filterResults = ko.computed(function() {
+  var searchWord = self.filterKeyword().toLowerCase();
+  var array = self.yelpDeals();
+
+  //first clear out all entries in the filteredList array
+  self.filteredList([]);
+  //Loop through the yelpDeals array and see if the search keyword matches 
+  //with any venue name or dealTags in the list, if so push that object to the filteredList 
+  //array and place the marker on the map.
+  for(var i=0; i < array.length; i++) {
+
+    if(array[i].dealName.toLowerCase().indexOf(searchWord) !== -1) {
+      if (self.mapMarkers()[i]) {
+        self.mapMarkers()[i].marker.setMap(map);
+      }
+      self.filteredList.push(array[i]);
     } else {
-      //first clear out all entries in the filteredList array
-      self.filteredList([]);
-      //Loop through the yelpDeals array and see if the search keyword matches 
-      //with any venue name or dealTags in the list, if so push that object to the filteredList 
-      //array and place the marker on the map.
-      for(var i=0; i < array.length; i++) {
-        if(array[i].dealName.toLowerCase().indexOf(searchWord) != -1) {
-          self.mapMarkers()[i].marker.setMap(map);
-          self.filteredList.push(array[i]);
-        } else{
-          for(var j = 0; j < array[i].dealTags.length; j++) {
-            if(array[i].dealTags[j].toLowerCase().indexOf(searchWord) != -1) {
-              self.mapMarkers()[i].marker.setMap(map);
-              self.filteredList.push(array[i]);
-          //otherwise hide all other markers from the map
-          } else {
-              self.mapMarkers()[i].marker.setMap(null);
-            }
+      for (var j = 0; j < array[i].dealTags.length; j++) {
+        if(array[i].dealTags[j].toLowerCase().indexOf(searchWord) !== -1) {
+          if (self.mapMarkers()[i]) {
+            self.mapMarkers()[i].marker.setMap(map);
           }
-          self.dealStatus(self.numDeals() + ' deals found for ' + self.filterKeyword());
+          self.filteredList.push(array[i]);
+        } else {
+          if (self.mapMarkers()[i]) {
+            self.mapMarkers()[i].marker.setMap(null);
+          }
         }
       }
     }
-  };
+    self.dealStatus(self.numDeals() + ' deals found for ' + self.filterKeyword());
+  }
+});
+
 
   //Clear keyword from filter and show all deals in current location again.
   this.clearFilter = function() {
@@ -305,6 +310,11 @@ function initMap() {
          map.setCenter(marker.position);
          infowindow.open(map, marker);
          map.panBy(0, -150);
+		 marker.setAnimation(google.maps.Animation.BOUNCE);
+		   window.setTimeout(function() {
+           marker.setAnimation(null);
+           }, 1900);
+          
        });
     });
   }
@@ -336,10 +346,13 @@ function initMap() {
           yelpReadableNames.push(readableName);
         }
 		
-        $('#autocomplete').autocomplete({
+       $('#autocomplete').autocomplete({
           lookup: yelpReadableNames,
           showNoSuggestionNotice: true,
           noSuggestionNotice: 'Sorry, no matching results',
+          onSelect: function (suggestion) {
+          self.searchLocation(suggestion.value);
+           }
         });
       },
       error: function() {
@@ -348,7 +361,7 @@ function initMap() {
       }
     });
 	
-  };
+  }
   
   //Manages the toggling of the list view, location centering, and search bar on a mobile device.
 
@@ -399,6 +412,7 @@ ko.bindingHandlers.selectOnFocus = {
         }
       };
 
-ko.applyBindings(new appViewModel());
-
+function googleCallback() {
+  ko.applyBindings(new appViewModel());
+}
 
