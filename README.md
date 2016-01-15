@@ -58,3 +58,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 * Special thanks to Udacity Teaching staffs and teaching materials
 * All internet resources specially in github and Stack Overflow
+* Special thanks to Udacity Reviewer Ryan Vrba who expalin all the code issue in detail and let me learn a lot from his comments.
